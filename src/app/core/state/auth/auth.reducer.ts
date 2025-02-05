@@ -1,17 +1,21 @@
 import { createReducer, on } from '@ngrx/store';
-import { User} from "../../../shared/models/user.model";
+import { User } from "../../../shared/models/user.model";
 import * as AuthActions from './auth.actions';
+
+
 
 export interface AuthState {
   user: User | null;
   error: string | null;
   loading: boolean;
+  collecteurs: User[];
 }
 
 export const initialState: AuthState = {
   user: null,
   error: null,
   loading: false,
+  collecteurs: []
 };
 
 export const authReducer = createReducer(
@@ -72,5 +76,14 @@ export const authReducer = createReducer(
     ...state,
     loading: false,
     error,
+  })),
+  on(AuthActions.loadCollecteursSuccess, (state, { collecteurs }) => ({
+    ...state,
+    collecteurs,
+    error: null
+  })),
+  on(AuthActions.loadCollecteursFailure, (state, { error }) => ({
+    ...state,
+    error
   }))
 );

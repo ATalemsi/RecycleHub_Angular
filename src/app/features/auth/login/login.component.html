@@ -13,7 +13,7 @@
       </div>
 
       <!-- Login Form -->
-      <form (ngSubmit)="onSubmit()" class="space-y-8">
+      <form (ngSubmit)="onSubmit()" #loginForm="ngForm" class="space-y-8">
         <!-- Email Field -->
         <div class="bg-green-50/50 backdrop-blur-sm p-8 rounded-2xl border border-green-200 hover:border-green-300 transition-colors">
           <h3 class="text-2xl font-bold text-green-900 mb-6 pb-3 border-b-2 border-green-200 flex items-center">
@@ -56,6 +56,7 @@
         <div class="space-y-8">
           <button
             type="submit"
+            [disabled]="!loginForm.form.valid"
             class="w-full py-4 px-6 bg-gradient-to-r from-green-500 to-green-600 text-white text-xl font-semibold rounded-xl
                    hover:from-green-600 hover:to-green-700 focus:outline-none focus:ring-4 focus:ring-green-500/20
                    disabled:from-gray-400 disabled:to-gray-500 disabled:cursor-not-allowed transform hover:scale-[1.02] active:scale-[0.98] transition-all duration-200"

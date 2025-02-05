@@ -7,6 +7,6 @@ export interface User {
   address: string;
   phoneNumber: string;
   dateOfBirth: string;
-  profilePhoto?: string; // Optionnel
-  role: 'particulier' | 'collecteur'; // Rôle de l'utilisateur
+  role: 'particulier' | 'collecteur';
+  profilePhoto?: string; // Optional profile photo URL
 }

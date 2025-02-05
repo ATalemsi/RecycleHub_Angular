@@ -1,5 +1,5 @@
 import { createAction, props } from '@ngrx/store';
-import { User} from "../../../shared/models/user.model";
+import { User } from "../../../shared/models/user.model";
 
 // Inscription
 export const register = createAction(
@@ -51,5 +51,30 @@ export const deleteAccount = createAction(
 export const deleteAccountSuccess = createAction('[Auth] Delete Account Success');
 export const deleteAccountFailure = createAction(
   '[Auth] Delete Account Failure',
+  props<{ error: string }>()
+);
+
+// Action pour charger les collecteurs depuis JSON
+export const loadCollecteurs = createAction('[Collecteurs] Load Collecteurs');
+
+// Succès du chargement
+export const loadCollecteursSuccess = createAction(
+  '[Collecteurs] Load Collecteurs Success',
+  props<{ collecteurs: User[] }>()
+);
+
+// Échec du chargement
+export const loadCollecteursFailure = createAction(
+  '[Collecteurs] Load Collecteurs Failure',
+  props<{ error: string }>()
+);
+// Vérifier l'authentification (Check Authentication)
+export const checkAuth = createAction('[Auth] Check Authentication');
+export const checkAuthSuccess = createAction(
+  '[Auth] Check Authentication Success',
+  props<{ user: User }>()
+);
+export const checkAuthFailure = createAction(
+  '[Auth] Check Authentication Failure',
   props<{ error: string }>()
 );

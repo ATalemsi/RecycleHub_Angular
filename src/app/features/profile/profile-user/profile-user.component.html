@@ -1,1 +1,63 @@
-<p>profile-user works!</p>
+<div class="p-6">
+  <ng-container *ngIf="(user$ | async) as user">
+    <div class="max-w-2xl mx-auto bg-white rounded-xl shadow-lg p-8">
+      <!-- Profile Header -->
+      <div class="text-center mb-8">
+        <div class="relative mb-4">
+          <ng-container *ngIf="user?.profilePhoto; else initialsTemplate">
+            <div class="w-32 h-32 mx-auto">
+              <img [src]="user.profilePhoto" alt="Profile photo" class="w-full h-full rounded-full object-cover">
+            </div>
+          </ng-container>
+          <ng-template #initialsTemplate>
+            <div class="w-32 h-32 mx-auto bg-green-100 rounded-full flex items-center justify-center">
+                  <span class="text-4xl text-green-600">
+                    {{user?.firstName?.charAt(0)}}{{user?.lastName?.charAt(0)}}
+                  </span>
+            </div>
+          </ng-template>
+        </div>
+        <h2 class="text-2xl font-bold text-gray-900">{{user?.firstName}} {{user?.lastName}}</h2>
+        <p class="text-gray-600">{{user?.role}}</p>
+      </div>
+
+      <!-- Profile Information -->
+      <div class="space-y-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="bg-gray-50 p-4 rounded-lg">
+            <p class="text-sm text-gray-600 mb-1">Email</p>
+            <p class="font-medium">{{user?.email}}</p>
+          </div>
+
+          <div class="bg-gray-50 p-4 rounded-lg">
+            <p class="text-sm text-gray-600 mb-1">Téléphone</p>
+            <p class="font-medium">{{user?.phoneNumber}}</p>
+          </div>
+
+          <div class="bg-gray-50 p-4 rounded-lg md:col-span-2">
+            <p class="text-sm text-gray-600 mb-1">Adresse</p>
+            <p class="font-medium">{{user?.address}}</p>
+          </div>
+
+          <div class="bg-gray-50 p-4 rounded-lg">
+            <p class="text-sm text-gray-600 mb-1">Date de naissance</p>
+            <p class="font-medium">{{user?.dateOfBirth}}</p>
+          </div>
+
+          <div class="bg-gray-50 p-4 rounded-lg">
+            <p class="text-sm text-gray-600 mb-1">Rôle</p>
+            <p class="font-medium">{{user?.role }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+
+  <div *ngIf="loading$ | async" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+    <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500"></div>
+  </div>
+
+  <div *ngIf="error$ | async as error" class="fixed bottom-4 right-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+    {{error}}
+  </div>
+</div>
