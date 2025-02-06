@@ -32,7 +32,10 @@ export const authReducer = createReducer(
     loading: false,
     error,
   })),
-
+  on(AuthActions.hydrateStateSuccess, (state, { user }) => ({
+    ...state,
+    user,
+  })),
   // Connexion
   on(AuthActions.login, (state) => ({ ...state, loading: true })),
   on(AuthActions.loginSuccess, (state, { user }) => ({

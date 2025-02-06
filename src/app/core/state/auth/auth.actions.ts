@@ -6,7 +6,7 @@ export const register = createAction(
   '[Auth] Register',
   props<{ user: User }>()
 );
-export const registerSuccess = createAction('[Auth] Register Success');
+export const registerSuccess = createAction("[Auth] Register Success", props<{ user: User }>())
 export const registerFailure = createAction(
   '[Auth] Register Failure',
   props<{ error: string }>()
@@ -78,3 +78,6 @@ export const checkAuthFailure = createAction(
   '[Auth] Check Authentication Failure',
   props<{ error: string }>()
 );
+
+export const hydrateState = createAction("[Auth] Hydrate State")
+export const hydrateStateSuccess = createAction("[Auth] Hydrate State Success", props<{ user: User | null }>())

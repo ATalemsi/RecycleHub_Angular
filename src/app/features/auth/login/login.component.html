@@ -3,9 +3,12 @@
     <div class="bg-white/90 backdrop-blur-sm p-6 md:p-10 rounded-2xl shadow-2xl">
       <!-- Header -->
       <div class="text-center mb-12">
-        <div class="w-28 h-28 bg-gradient-to-br from-green-400 to-green-600 rounded-full mx-auto mb-8 flex items-center justify-center transform rotate-12 hover:rotate-0 transition-transform duration-300">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-14 w-14 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+        <div
+          class="w-28 h-28 bg-gradient-to-br from-green-400 to-green-600 rounded-full mx-auto mb-8 flex items-center justify-center transform rotate-12 hover:rotate-0 transition-transform duration-300">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-14 w-14 text-white" fill="none" viewBox="0 0 24 24"
+               stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
           </svg>
         </div>
         <h2 class="text-4xl font-bold text-green-900 mb-3">Connexion à RecycleHub</h2>
@@ -13,13 +16,12 @@
       </div>
 
       <!-- Login Form -->
+      <!-- login.component.html -->
       <form (ngSubmit)="onSubmit()" #loginForm="ngForm" class="space-y-8">
         <!-- Email Field -->
         <div class="bg-green-50/50 backdrop-blur-sm p-8 rounded-2xl border border-green-200 hover:border-green-300 transition-colors">
           <h3 class="text-2xl font-bold text-green-900 mb-6 pb-3 border-b-2 border-green-200 flex items-center">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 mr-3 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-            </svg>
+            <!-- ... (svg icon) ... -->
             Identifiants de connexion
           </h3>
 
@@ -32,9 +34,14 @@
                 name="email"
                 [(ngModel)]="email"
                 required
+                [class.border-red-500]="formErrors.email"
                 placeholder="votre@email.com"
                 class="w-full p-4 bg-white/80 border-2 border-green-200 rounded-xl focus:ring-4 focus:ring-green-500/20 focus:border-green-500 transition-all"
               >
+              <!-- Message d'erreur email -->
+              <p *ngIf="formErrors.email" class="mt-2 text-sm text-red-600">
+                {{ formErrors.email }}
+              </p>
             </div>
 
             <div class="space-y-2">
@@ -45,12 +52,27 @@
                 name="password"
                 [(ngModel)]="password"
                 required
+                [class.border-red-500]="formErrors.password"
                 placeholder="Entrez votre mot de passe"
                 class="w-full p-4 bg-white/80 border-2 border-green-200 rounded-xl focus:ring-4 focus:ring-green-500/20 focus:border-green-500 transition-all"
               >
+              <!-- Message d'erreur password -->
+              <p *ngIf="formErrors.password" class="mt-2 text-sm text-red-600">
+                {{ formErrors.password }}
+              </p>
             </div>
           </div>
         </div>
+
+        <!-- Message d'erreur général -->
+        <p *ngIf="formErrors.general" class="text-red-600 text-center text-lg font-semibold mt-4">
+          {{ formErrors.general }}
+        </p>
+
+        <!-- Message d'erreur du store -->
+        <p *ngIf="(error$ | async) as error" class="text-red-600 text-center text-lg font-semibold mt-4">
+          {{ error }}
+        </p>
 
         <!-- Submit Button -->
         <div class="space-y-8">
@@ -58,10 +80,11 @@
             type="submit"
             [disabled]="!loginForm.form.valid"
             class="w-full py-4 px-6 bg-gradient-to-r from-green-500 to-green-600 text-white text-xl font-semibold rounded-xl
-                   hover:from-green-600 hover:to-green-700 focus:outline-none focus:ring-4 focus:ring-green-500/20
-                   disabled:from-gray-400 disabled:to-gray-500 disabled:cursor-not-allowed transform hover:scale-[1.02] active:scale-[0.98] transition-all duration-200"
+             hover:from-green-600 hover:to-green-700 focus:outline-none focus:ring-4 focus:ring-green-500/20
+             disabled:from-gray-400 disabled:to-gray-500 disabled:cursor-not-allowed transform hover:scale-[1.02] active:scale-[0.98] transition-all duration-200"
           >
-            Se connecter
+            <span *ngIf="!(loading$ | async)">Se connecter</span>
+            <span *ngIf="loading$ | async">Chargement...</span>
           </button>
 
           <p class="text-center text-lg text-green-700">

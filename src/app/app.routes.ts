@@ -1,5 +1,9 @@
 import { Routes } from '@angular/router';
 import {AuthGuard} from "./Guards/auth.guard";
+import {ParticulierGuard} from "./Guards/particulier.guard";
+import {
+  CollectionRequestFormComponent
+} from "./features/collecte/collection-request-form/collection-request-form.component";
 
 export const routes: Routes = [
   {
@@ -21,6 +25,30 @@ export const routes: Routes = [
     loadComponent: () =>
       import("./features/profile/profile-user/profile-user.component").then((m) => m.ProfileUserComponent),
     canActivate: [AuthGuard],
+  },
+  {
+    path: "collections",
+    loadComponent: () =>
+      import("./features/collecte/particulier-collections/particulier-collections.component").then(
+        (m) => m.ParticulierCollectionsComponent,
+      ),
+    canActivate: [AuthGuard, ParticulierGuard],
+  },
+  {
+    path: "collections/add",
+    loadComponent: () =>
+      import("./features/collecte/collection-request-form/collection-request-form.component").then(
+        (m) => m.CollectionRequestFormComponent,
+      ),
+    canActivate: [AuthGuard, ParticulierGuard],
+  },
+  {
+    path: "collections/edit/:id",
+    loadComponent: () =>
+      import("./features/collecte/collection-request-form/collection-request-form.component").then(
+        (m) => m.CollectionRequestFormComponent,
+      ),
+    canActivate: [AuthGuard, ParticulierGuard],
   },
   { path: '', redirectTo: 'login', pathMatch: 'full' }, // Redirection par défaut vers login
   { path: '**', redirectTo: 'login' }, // Redirection pour les routes inconnues

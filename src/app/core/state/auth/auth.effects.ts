@@ -19,13 +19,30 @@ export class AuthEffects {
   register$ = createEffect(() =>
     this.actions$.pipe(
       ofType(AuthActions.register),
+      tap(() => console.log('Register action received')), // Log de debug
       switchMap(({ user }) =>
         this.authService.register(user).pipe(
-          map(() => AuthActions.registerSuccess()),
-          catchError((error) => of(AuthActions.registerFailure({ error: error.message }))),
+          tap(newUser => console.log('Registration successful:', newUser)), // Log de debug
+          map((newUser) => AuthActions.registerSuccess({ user: newUser })),
+          catchError((error) => {
+            console.error('Registration failed:', error); // Log de debug
+            return of(AuthActions.registerFailure({ error: error.message }));
+          }),
         ),
       ),
     ),
+  );
+
+  registerSuccess$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(AuthActions.registerSuccess),
+        tap(() => {
+          console.log('RegisterSuccess action received, navigating...'); // Log de debug
+          this.router.navigate(["/collections"]);
+        }),
+      ),
+    { dispatch: false },
   );
 
   login$ = createEffect(() =>
@@ -40,11 +57,12 @@ export class AuthEffects {
     ),
   )
 
+
   loginSuccess$ = createEffect(
     () =>
       this.actions$.pipe(
         ofType(AuthActions.loginSuccess),
-        tap(() => this.router.navigate(["/profile"])),
+        tap(() => this.router.navigate(["/collections"])),
       ),
     { dispatch: false },
   )
@@ -85,6 +103,17 @@ export class AuthEffects {
       ),
     ),
   );
+  logout$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(AuthActions.logout),
+        tap(() => {
+          this.authService.logout()
+          this.router.navigate(["/login"])
+        }),
+      ),
+    { dispatch: false },
+  )
 
   checkAuth$ = createEffect(() =>
     this.actions$.pipe(
@@ -101,4 +130,32 @@ export class AuthEffects {
       )
     )
   );
+
+  hydrateState$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(AuthActions.hydrateState),
+      map(() => {
+        const user = this.authService.getLoggedInUser()
+        return AuthActions.hydrateStateSuccess({ user })
+      }),
+    ),
+  )
+
+  // Add this effect to persist state changes
+  persistState$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(
+          AuthActions.loginSuccess,
+          AuthActions.registerSuccess,
+          AuthActions.updateProfileSuccess,
+          AuthActions.logout,
+        ),
+        tap(() => {
+          const user = this.authService.getLoggedInUser()
+          localStorage.setItem("app-state", JSON.stringify({ auth: { user } }))
+        }),
+      ),
+    { dispatch: false },
+  )
 }

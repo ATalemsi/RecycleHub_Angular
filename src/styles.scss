@@ -1,6 +1,20 @@
 /* You can add global styles to this file, and also import other style files */
 
+body, button, input, select, textarea {
+  font-family: 'Inter', sans-serif;
+}
 
+h2 {
+  font-weight: 700;
+}
+
+p, label {
+  font-weight: 400;
+}
+
+button {
+  font-weight: 600;
+}
 
 @tailwind base;
 @tailwind components;

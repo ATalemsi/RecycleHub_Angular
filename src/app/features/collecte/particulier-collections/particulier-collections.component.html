@@ -1,0 +1,57 @@
+<app-navbar></app-navbar>
+<div class="min-h-screen bg-gradient-to-b from-green-50 to-white py-12 font-sans">
+  <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-12">
+      <h1 class="text-4xl font-extrabold text-green-800 mb-4">My Collection Requests</h1>
+      <p class="text-xl text-green-600">Manage your waste collection requests</p>
+    </div>
+    <div class="flex justify-center mb-8">
+      <button routerLink="/collections/add" class="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-6 rounded-full transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50">
+        <span class="mr-2">+</span> New Collection Request
+      </button>
+    </div>
+    <div *ngIf="loading$ | async" class="flex justify-center items-center h-64">
+      <div class="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-green-500"></div>
+    </div>
+
+    <div *ngIf="(filteredWasteRequests$ | async)?.length === 0" class="text-center py-12">
+      <p class="text-xl text-gray-600">You don't have any collection requests yet.</p>
+      <p class="mt-4 text-green-600">Click the "New Collection Request" button to get started!</p>
+    </div>
+    <div class="mt-12">
+      <h2 class="text-2xl font-semibold mb-6 text-green-700 text-center">Existing Requests</h2>
+      <div *ngIf="(filteredWasteRequests$ | async) as requests" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div *ngFor="let request of requests" class="bg-white shadow-lg rounded-lg overflow-hidden transition duration-300 ease-in-out transform hover:scale-102 hover:shadow-xl">
+          <div class="p-6">
+            <div class="flex justify-between items-center mb-4">
+              <h3 class="text-xl font-semibold text-green-600">{{ request.wasteType }}</h3>
+              <span [ngClass]="{
+                'bg-yellow-100 text-yellow-800': request.status === 'pending',
+                'bg-green-100 text-green-800': request.status === 'occupied',
+                'bg-blue-100 text-blue-800': request.status === 'ongoing',
+                'bg-red-100 text-grey-800': request.status === 'validated',
+                'bg-gray-100 text-red-800': request.status === 'rejected'
+              }" class="px-3 py-1 rounded-full text-sm font-medium">
+                {{ request.status | titlecase }}
+              </span>
+            </div>
+            <div class="space-y-2">
+              <p><span class="text-green-500 font-medium">Weight:</span> {{ request.estimatedWeight }}g</p>
+              <p><span class="text-green-500 font-medium">Address:</span> {{ request.collectionAddress }}</p>
+              <p><span class="text-green-500 font-medium">Date:</span> {{ request.preferredDateTime | date:'mediumDate' }}</p>
+              <p><span class="text-green-500 font-medium">Time Slot:</span> {{ request.preferredDateTime | date:'shortTime' }}</p>
+            </div>
+            <div *ngIf="request.additionalNotes" class="mt-4 p-3 bg-green-50 rounded-md">
+              <p class="text-sm text-green-700"><span class="font-medium">Notes:</span> {{ request.additionalNotes }}</p>
+            </div>
+          </div>
+          <div *ngIf="request.status == 'pending'" class="bg-green-50 px-6 py-4 flex justify-between">
+            <button (click)="editRequest(request.id!)" class="text-green-600 hover:text-green-800 font-medium transition duration-300 ease-in-out">Edit</button>
+            <button (click)="deleteRequest(request.id!)" class="text-red-600 hover:text-red-800 font-medium transition duration-300 ease-in-out">Cancel</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+

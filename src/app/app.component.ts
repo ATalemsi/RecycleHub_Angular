@@ -1,7 +1,7 @@
-import { Component } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import {Store} from "@ngrx/store";
-import {loadCollecteurs} from "./core/state/auth/auth.actions";
+import {hydrateState, loadCollecteurs} from "./core/state/auth/auth.actions";
 
 @Component({
   selector: 'app-root',
@@ -10,10 +10,17 @@ import {loadCollecteurs} from "./core/state/auth/auth.actions";
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })
-export class AppComponent {
-  constructor(private store: Store) {}
+export class AppComponent  implements OnInit {
+  constructor(private readonly store: Store) {}
 
   ngOnInit() {
-    this.store.dispatch(loadCollecteurs());
+    const hasInitialized = localStorage.getItem('appInitialized');
+
+    if (!hasInitialized) {
+      this.store.dispatch(loadCollecteurs());
+      this.store.dispatch(hydrateState());
+      localStorage.setItem('appInitialized', 'true');
+    }
   }
+
 }

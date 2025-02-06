@@ -1,14 +1,18 @@
-import {Component} from '@angular/core';
-import {User} from "../../../shared/models/user.model";
-import {Store} from "@ngrx/store";
-import {register} from "../../../core/state/auth/auth.actions";
-import {FormsModule} from "@angular/forms";
+import { Component } from '@angular/core';
+import { User } from "../../../shared/models/user.model";
+import { Store } from "@ngrx/store";
+import { register } from "../../../core/state/auth/auth.actions";
+import { FormsModule } from "@angular/forms";
+import { selectError, selectLoading } from "../../../core/state/auth/auth.selectors";
+import { NgIf, AsyncPipe } from "@angular/common";
 
 @Component({
   selector: 'app-register',
   standalone: true,
   imports: [
-    FormsModule
+    FormsModule,
+    NgIf,
+    AsyncPipe
   ],
   templateUrl: './register.component.html',
   styleUrl: './register.component.scss'
@@ -26,11 +30,176 @@ export class RegisterComponent {
     role: 'particulier',
   };
 
-  constructor(private readonly store: Store) {
+  formErrors = {
+    firstName: '',
+    lastName: '',
+    email: '',
+    password: '',
+    dateOfBirth: '',
+    address: '',
+    phoneNumber: '',
+    terms: '',
+    general: ''
+  };
+
+  loading$ = this.store.select(selectLoading);
+  error$ = this.store.select(selectError);
+  termsAccepted = false;
+
+  constructor(private readonly store: Store) {}
+
+  onFieldChange(field: keyof typeof this.formErrors) {
+    this.validateField(field);
+  }
+
+  validateField(field: keyof typeof this.formErrors) {
+    switch(field) {
+      case 'firstName':
+        if (!this.user.firstName.trim()) {
+          this.formErrors.firstName = 'Le prénom est requis';
+        } else if (this.user.firstName.length < 2) {
+          this.formErrors.firstName = 'Le prénom doit contenir au moins 2 caractères';
+        } else {
+          this.formErrors.firstName = '';
+        }
+        break;
+
+      case 'lastName':
+        if (!this.user.lastName.trim()) {
+          this.formErrors.lastName = 'Le nom est requis';
+        } else if (this.user.lastName.length < 2) {
+          this.formErrors.lastName = 'Le nom doit contenir au moins 2 caractères';
+        } else {
+          this.formErrors.lastName = '';
+        }
+        break;
+
+      case 'email':
+        if (!this.user.email) {
+          this.formErrors.email = 'L\'email est requis';
+        } else if (!this.isValidEmail(this.user.email)) {
+          this.formErrors.email = 'Format d\'email invalide';
+        } else if (this.emailExists(this.user.email)) {
+          this.formErrors.email = 'Cet email est déjà utilisé';
+        } else {
+          this.formErrors.email = '';
+        }
+        break;
+
+      case 'password':
+        if (!this.user.password) {
+          this.formErrors.password = 'Le mot de passe est requis';
+        } else if (!this.isValidPassword(this.user.password)) {
+          this.formErrors.password = 'Le mot de passe doit contenir au moins 6 caractères';
+        } else {
+          this.formErrors.password = '';
+        }
+        break;
+
+      case 'dateOfBirth':
+        if (!this.user.dateOfBirth) {
+          this.formErrors.dateOfBirth = 'La date de naissance est requise';
+        } else if (!this.isValidAge(this.user.dateOfBirth)) {
+          this.formErrors.dateOfBirth = 'Vous devez avoir au moins 18 ans';
+        } else {
+          this.formErrors.dateOfBirth = '';
+        }
+        break;
+
+      case 'address':
+        if (!this.user.address.trim()) {
+          this.formErrors.address = 'L\'adresse est requise';
+        } else if (this.user.address.length < 10) {
+          this.formErrors.address = 'Veuillez entrer une adresse complète';
+        } else {
+          this.formErrors.address = '';
+        }
+        break;
+
+      case 'phoneNumber':
+        if (!this.user.phoneNumber) {
+          this.formErrors.phoneNumber = 'Le numéro de téléphone est requis';
+        } else if (!this.isValidPhoneNumber(this.user.phoneNumber)) {
+          this.formErrors.phoneNumber = 'Format de numéro de téléphone invalide';
+        } else {
+          this.formErrors.phoneNumber = '';
+        }
+        break;
+    }
+  }
+
+  validateForm(): boolean {
+    this.resetErrors();
+    let isValid = true;
+
+    // Valider tous les champs
+    Object.keys(this.formErrors).forEach(field => {
+      this.validateField(field as keyof typeof this.formErrors);
+      if (this.formErrors[field as keyof typeof this.formErrors]) {
+        isValid = false;
+      }
+    });
+
+    // Validation des conditions d'utilisation
+    if (!this.termsAccepted) {
+      this.formErrors.terms = 'Vous devez accepter les conditions d\'utilisation';
+      isValid = false;
+    }
+
+    return isValid;
   }
 
   onSubmit() {
-    this.store.dispatch(register({user: this.user}));
+    if (this.validateForm()) {
+      this.store.dispatch(register({ user: this.user }));
+    } else {
+      this.formErrors.general = 'Veuillez corriger les erreurs dans le formulaire';
+    }
   }
 
+  private resetErrors() {
+    this.formErrors = {
+      firstName: '',
+      lastName: '',
+      email: '',
+      password: '',
+      dateOfBirth: '',
+      address: '',
+      phoneNumber: '',
+      terms: '',
+      general: ''
+    };
+  }
+
+  private isValidEmail(email: string): boolean {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  }
+
+  private isValidPassword(password: string): boolean {
+    return password.length >= 6;
+  }
+
+  private isValidPhoneNumber(phone: string): boolean {
+    const phoneRegex = /^(?:(?:\+|00)33|0)\s*[1-9](?:[\s.-]*\d{2}){4}$/;
+    return phoneRegex.test(phone);
+  }
+
+  private isValidAge(dateOfBirth: string): boolean {
+    const birthDate = new Date(dateOfBirth);
+    const today = new Date();
+    const age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+      return age - 1 >= 18;
+    }
+
+    return age >= 18;
+  }
+
+  private emailExists(email: string): boolean {
+    const users = JSON.parse(localStorage.getItem('recyclehub-users') || '[]');
+    return users.some((user: User) => user.email === email);
+  }
 }
