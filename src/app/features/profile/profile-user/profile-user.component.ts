@@ -14,10 +14,7 @@ import { NavbarComponent } from "../../navbar/navbar.component";
 @Component({
   selector: 'app-profile-user',
   standalone: true,
-  imports: [
-    NgIf,
-    AsyncPipe
-  ],
+  imports: [NgIf, AsyncPipe, ReactiveFormsModule, NavbarComponent],
   templateUrl: './profile-user.component.html',
   styleUrl: './profile-user.component.scss'
 })
