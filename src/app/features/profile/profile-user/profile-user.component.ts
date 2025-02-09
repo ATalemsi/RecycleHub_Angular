@@ -1,12 +1,15 @@
-import {Component} from '@angular/core';
-import {selectError, selectLoading, selectUser} from '../../../core/state/auth/auth.selectors';
-import {Store} from "@ngrx/store";
-import {AuthService} from "../../../core/services/auth/auth.service";
-import {Router} from "@angular/router";
-import {AsyncPipe, NgIf} from "@angular/common";
-import {AuthState} from "../../../core/state/auth/auth.reducer";
-import {Observable} from "rxjs";
-import {User} from "../../../shared/models/user.model";
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { selectError, selectLoading, selectUser } from '../../../core/state/auth/auth.selectors';
+import { Store } from "@ngrx/store";
+import { AuthService } from "../../../core/services/auth/auth.service";
+import { Router } from "@angular/router";
+import { AsyncPipe, NgIf } from "@angular/common";
+import { AuthState } from "../../../core/state/auth/auth.reducer";
+import {Observable, Subject, Subscription, takeUntil} from "rxjs";
+import { User } from "../../../shared/models/user.model";
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
+import { deleteAccount, updateProfile } from "../../../core/state/auth/auth.actions";
+import { NavbarComponent } from "../../navbar/navbar.component";
 
 @Component({
   selector: 'app-profile-user',
