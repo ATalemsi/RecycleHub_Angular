@@ -18,7 +18,7 @@ import { NavbarComponent } from "../../navbar/navbar.component";
   templateUrl: './profile-user.component.html',
   styleUrl: './profile-user.component.scss'
 })
-export class ProfileUserComponent {
+export class ProfileUserComponent implements OnInit, OnDestroy {
   user$: Observable<User | null> = this.store.select(selectUser);
   error$: Observable<string | null> = this.store.select(selectError);
   loading$: Observable<boolean> = this.store.select(selectLoading);
