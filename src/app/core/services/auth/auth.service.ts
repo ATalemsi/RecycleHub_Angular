@@ -66,12 +66,20 @@ export class AuthService {
       const users = this.getUsers()
       const index = users.findIndex((u) => u.id === user.id)
       if (index !== -1) {
-        users[index] = user
+        // If a new password is provided, update it
+        if (user.password) {
+          users[index] = { ...user, password: user.password }
+        } else {
+          // If no new password, keep the existing password
+          users[index] = { ...user, password: users[index].password }
+        }
         localStorage.setItem(this.usersKey, JSON.stringify(users))
         if (this.getLoggedInUser()?.id === user.id) {
-          localStorage.setItem(this.loggedInUserKey, JSON.stringify(user))
+          localStorage.setItem(this.loggedInUserKey, JSON.stringify(users[index]))
         }
-        return of(user)
+        // Remove password from the returned user object
+        const { password, ...userWithoutPassword } = users[index]
+        return of(userWithoutPassword)
       }
       return throwError(() => new Error("User not found"))
     } catch (error) {

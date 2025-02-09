@@ -1,12 +1,18 @@
+// models/user.model.ts
+export interface Address {
+  street: string;
+  city: string;
+}
+
 export interface User {
   id: string;
   email: string;
-  password: string;
+  password?: string;
   firstName: string;
   lastName: string;
-  address: string;
+  address: Address;
   phoneNumber: string;
   dateOfBirth: string;
-  role: 'particulier' | 'collecteur';
-  profilePhoto?: string; // Optional profile photo URL
+  role: 'particulier' | 'collecteurs';
+  profilePhoto?: string;
 }

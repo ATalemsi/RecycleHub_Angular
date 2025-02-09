@@ -45,6 +45,18 @@ export class WasteRequestEffects {
     )
   );
 
+  updateWasteRequestStatus$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(WasteRequestActions.updateWasteRequestStatus),
+      mergeMap((action) =>
+        this.wasteRequestService.updateWasteRequestStatus(action.request, action.newStatus).pipe(
+          map((updatedRequest) => WasteRequestActions.updateWasteRequestStatusSuccess({ updatedRequest })),
+          catchError((error) => of(WasteRequestActions.updateWasteRequestStatusFailure({ error: error.message }))),
+        ),
+      ),
+    ),
+  )
+
   deleteWasteRequest$ = createEffect(() =>
     this.actions$.pipe(
       ofType(WasteRequestActions.deleteWasteRequest),

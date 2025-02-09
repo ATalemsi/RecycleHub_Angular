@@ -1,12 +1,19 @@
+// models/collection-request.model.ts
+import {Address} from "./user.model";
+
+export interface WasteTypeWeight {
+  type: string;
+  weight: number;
+}
+
 export interface WasteRequest {
   id?: string;
-  wasteType: 'plastic' | 'glass' | 'paper' | 'metal';
+  wasteTypes: WasteTypeWeight[];  // Changed from wasteType: string[]
   wastePhotos?: string[];
-  estimatedWeight: number;
-  collectionAddress: string;
+  estimatedWeight: number;  // This will be the sum of all waste type weights
+  collectionAddress: Address;
   preferredDateTime: Date;
   additionalNotes?: string;
   status: 'pending' | 'occupied' | 'ongoing' | 'validated' | 'rejected';
-  userId: number;
+  userId: string;
 }
-

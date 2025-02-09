@@ -52,6 +52,20 @@ export const wasteRequestReducer = createReducer(
     error,
     loading: false,
   })),
+  on(WasteRequestActions.updateWasteRequestStatus, (state) => ({
+    ...state,
+    loading: true,
+  })),
+  on(WasteRequestActions.updateWasteRequestStatusSuccess, (state, { updatedRequest }) => ({
+    ...state,
+    wasteRequests: state.wasteRequests.map((request) => (request.id === updatedRequest.id ? updatedRequest : request)),
+    loading: false,
+  })),
+  on(WasteRequestActions.updateWasteRequestStatusFailure, (state, { error }) => ({
+    ...state,
+    error,
+    loading: false,
+  })),
   on(WasteRequestActions.deleteWasteRequest, (state, { requestId }) => ({
     ...state,
     wasteRequests: state.wasteRequests.filter(r => r.id !== requestId),

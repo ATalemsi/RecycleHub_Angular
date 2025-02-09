@@ -121,23 +121,43 @@
           </h3>
 
           <div class="space-y-6">
-            <!-- Adresse -->
+            <!-- Street Address -->
             <div class="space-y-2">
-              <label for="address" class="block text-base font-semibold text-green-800">Adresse *</label>
-              <textarea
-                id="address"
-                name="address"
-                [(ngModel)]="user.address"
+              <label for="street" class="block text-base font-semibold text-green-800">Rue *</label>
+              <input
+                type="text"
+                id="street"
+                name="street"
+                [(ngModel)]="user.address.street"
                 required
-                [class.border-red-500]="formErrors.address"
-                (blur)="onFieldChange('address')"
-                (input)="onFieldChange('address')"
-                placeholder="Votre adresse complète"
-                rows="4"
+                [class.border-red-500]="formErrors['address.street']"
+                (blur)="onFieldChange('address.street')"
+                (input)="onFieldChange('address.street')"
+                placeholder="Numéro et nom de rue"
                 class="w-full p-4 bg-white/80 border-2 border-green-200 rounded-xl focus:ring-4 focus:ring-green-500/20 focus:border-green-500 transition-all"
-              ></textarea>
-              <p *ngIf="formErrors.address" class="mt-2 text-sm text-red-600">
-                {{ formErrors.address }}
+              >
+              <p *ngIf="formErrors['address.street']" class="mt-2 text-sm text-red-600">
+                {{ formErrors['address.street'] }}
+              </p>
+            </div>
+
+            <!-- City -->
+            <div class="space-y-2">
+              <label for="city" class="block text-base font-semibold text-green-800">Ville *</label>
+              <input
+                type="text"
+                id="city"
+                name="city"
+                [(ngModel)]="user.address.city"
+                required
+                [class.border-red-500]="formErrors['address.city']"
+                (blur)="onFieldChange('address.city')"
+                (input)="onFieldChange('address.city')"
+                placeholder="Ville"
+                class="w-full p-4 bg-white/80 border-2 border-green-200 rounded-xl focus:ring-4 focus:ring-green-500/20 focus:border-green-500 transition-all"
+              >
+              <p *ngIf="formErrors['address.city']" class="mt-2 text-sm text-red-600">
+                {{ formErrors['address.city'] }}
               </p>
             </div>
 

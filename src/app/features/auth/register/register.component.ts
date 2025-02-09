@@ -24,7 +24,10 @@ export class RegisterComponent {
     password: '',
     firstName: '',
     lastName: '',
-    address: '',
+    address: {
+      street: '',
+      city: ''
+    },
     phoneNumber: '',
     dateOfBirth: '',
     role: 'particulier',
@@ -36,7 +39,8 @@ export class RegisterComponent {
     email: '',
     password: '',
     dateOfBirth: '',
-    address: '',
+    'address.street': '',
+    'address.city': '',
     phoneNumber: '',
     terms: '',
     general: ''
@@ -106,13 +110,23 @@ export class RegisterComponent {
         }
         break;
 
-      case 'address':
-        if (!this.user.address.trim()) {
-          this.formErrors.address = 'L\'adresse est requise';
-        } else if (this.user.address.length < 10) {
-          this.formErrors.address = 'Veuillez entrer une adresse complète';
+      case 'address.street':
+        if (!this.user.address.street.trim()) {
+          this.formErrors['address.street'] = 'La rue est requise';
+        } else if (this.user.address.street.length < 5) {
+          this.formErrors['address.street'] = 'Veuillez entrer une rue valide';
         } else {
-          this.formErrors.address = '';
+          this.formErrors['address.street'] = '';
+        }
+        break;
+
+      case 'address.city':
+        if (!this.user.address.city.trim()) {
+          this.formErrors['address.city'] = 'La ville est requise';
+        } else if (this.user.address.city.length < 2) {
+          this.formErrors['address.city'] = 'Veuillez entrer une ville valide';
+        } else {
+          this.formErrors['address.city'] = '';
         }
         break;
 
@@ -132,7 +146,6 @@ export class RegisterComponent {
     this.resetErrors();
     let isValid = true;
 
-    // Valider tous les champs
     Object.keys(this.formErrors).forEach(field => {
       this.validateField(field as keyof typeof this.formErrors);
       if (this.formErrors[field as keyof typeof this.formErrors]) {
@@ -140,7 +153,6 @@ export class RegisterComponent {
       }
     });
 
-    // Validation des conditions d'utilisation
     if (!this.termsAccepted) {
       this.formErrors.terms = 'Vous devez accepter les conditions d\'utilisation';
       isValid = false;
@@ -164,7 +176,8 @@ export class RegisterComponent {
       email: '',
       password: '',
       dateOfBirth: '',
-      address: '',
+      'address.street': '',
+      'address.city': '',
       phoneNumber: '',
       terms: '',
       general: ''

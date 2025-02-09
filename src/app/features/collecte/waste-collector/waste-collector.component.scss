@@ -1,0 +1,44 @@
+:host {
+  display: block;
+  background-color: #f9fafb;
+  min-height: 100vh;
+}
+
+.container {
+  max-width: 1400px;
+}
+
+// Custom scrollbar for the table container
+.overflow-x-auto {
+  &::-webkit-scrollbar {
+    height: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background: #666;
+  }
+}
+
+// Smooth transitions for interactive elements
+select {
+  transition: all 0.2s ease-in-out;
+
+  &:hover {
+    border-color: #10B981;
+  }
+}
+
+tr {
+  transition: all 0.2s ease-in-out;
+}
+

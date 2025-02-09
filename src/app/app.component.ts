@@ -22,5 +22,4 @@ export class AppComponent  implements OnInit {
       localStorage.setItem('appInitialized', 'true');
     }
   }
-
 }

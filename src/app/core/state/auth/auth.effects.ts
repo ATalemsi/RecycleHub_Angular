@@ -7,8 +7,14 @@ import * as AuthActions from "./auth.actions";
 import { CollecteurService } from "../../services/collecteur/collecteur.service";
 import {Router} from "@angular/router";
 
+export enum UserRole {
+  PARTICULIER = 'particulier',
+  COLLECTEURS = 'collecteurs'
+}
+
 @Injectable()
 export class AuthEffects {
+
   constructor(
     private readonly actions$: Actions,
     private readonly authService: AuthService,
@@ -39,7 +45,7 @@ export class AuthEffects {
         ofType(AuthActions.registerSuccess),
         tap(() => {
           console.log('RegisterSuccess action received, navigating...'); // Log de debug
-          this.router.navigate(["/collections"]);
+          this.router.navigate(["/login"]);
         }),
       ),
     { dispatch: false },
@@ -62,7 +68,15 @@ export class AuthEffects {
     () =>
       this.actions$.pipe(
         ofType(AuthActions.loginSuccess),
-        tap(() => this.router.navigate(["/collections"])),
+        tap(({ user }) => {
+          if (user.role === UserRole.PARTICULIER) {
+            this.router.navigate(["/collections"])
+          } else if (user.role === UserRole.COLLECTEURS) {
+            this.router.navigate(["/collections/dashboard"])
+          } else {
+            this.router.navigate(["/profile"])
+          }
+        }),
       ),
     { dispatch: false },
   )
@@ -79,16 +93,21 @@ export class AuthEffects {
     ),
   );
 
+  // Update the auth.effects.ts
   deleteAccount$ = createEffect(() =>
     this.actions$.pipe(
       ofType(AuthActions.deleteAccount),
       switchMap(({ userId }) =>
         this.authService.deleteAccount(userId).pipe(
-          map(() => AuthActions.deleteAccountSuccess()),
+          map(() => {
+            this.authService.logout();
+            this.router.navigate(['/login']);
+            return AuthActions.deleteAccountSuccess();
+          }),
           catchError((error) => of(AuthActions.deleteAccountFailure({ error: error.message }))),
         ),
       ),
-    ),
+    )
   );
 
   loadCollecteurs$ = createEffect(() =>

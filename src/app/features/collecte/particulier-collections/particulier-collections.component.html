@@ -24,7 +24,7 @@
         <div *ngFor="let request of requests" class="bg-white shadow-lg rounded-lg overflow-hidden transition duration-300 ease-in-out transform hover:scale-102 hover:shadow-xl">
           <div class="p-6">
             <div class="flex justify-between items-center mb-4">
-              <h3 class="text-xl font-semibold text-green-600">{{ request.wasteType }}</h3>
+              <h3 class="text-xl font-semibold text-green-600">{{ getWasteTypesDisplay(request.wasteTypes) }}</h3>
               <span [ngClass]="{
                 'bg-yellow-100 text-yellow-800': request.status === 'pending',
                 'bg-green-100 text-green-800': request.status === 'occupied',
@@ -37,7 +37,7 @@
             </div>
             <div class="space-y-2">
               <p><span class="text-green-500 font-medium">Weight:</span> {{ request.estimatedWeight }}g</p>
-              <p><span class="text-green-500 font-medium">Address:</span> {{ request.collectionAddress }}</p>
+              <p><span class="text-green-500 font-medium">Address:</span> {{ formatAddress(request.collectionAddress) }}</p>
               <p><span class="text-green-500 font-medium">Date:</span> {{ request.preferredDateTime | date:'mediumDate' }}</p>
               <p><span class="text-green-500 font-medium">Time Slot:</span> {{ request.preferredDateTime | date:'shortTime' }}</p>
             </div>

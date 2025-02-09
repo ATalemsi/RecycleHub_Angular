@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { WasteRequest } from '../../../shared/models/collection-request.model';
 import { Observable, of } from 'rxjs';
-
+type WasteRequestStatus = WasteRequest["status"]
 @Injectable({
   providedIn: 'root',
 })
@@ -45,5 +45,20 @@ export class WasteRequestService {
 
   private saveWasteRequests(requests: WasteRequest[]): void {
     localStorage.setItem(this.storageKey, JSON.stringify(requests));
+  }
+
+  updateWasteRequestStatus(request: WasteRequest, newStatus: WasteRequest["status"]): Observable<WasteRequest> {
+    const requests = this.getWasteRequests()
+    const index = requests.findIndex((r) => r.id === request.id)
+
+    if (index !== -1) {
+      const updatedRequest = { ...request, status: newStatus }
+      requests[index] = updatedRequest
+      this.saveWasteRequests(requests)
+      return of(updatedRequest)
+    }
+
+    // Instead of returning null, throw an error
+    throw new Error(`Request with id ${request.id} not found`)
   }
 }

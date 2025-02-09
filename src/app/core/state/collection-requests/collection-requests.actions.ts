@@ -32,6 +32,21 @@ export const updateWasteRequestFailure = createAction(
   props<{ error: any }>()
 );
 
+export const updateWasteRequestStatus = createAction(
+  "[Waste Request] Update Waste Request Status",
+  props<{ request: WasteRequest; newStatus: WasteRequest["status"] }>(),
+)
+
+export const updateWasteRequestStatusSuccess = createAction(
+  "[Waste Request] Update Waste Request Status Success",
+  props<{ updatedRequest: WasteRequest }>(),
+)
+
+export const updateWasteRequestStatusFailure = createAction(
+  "[Waste Request] Update Waste Request Status Failure",
+  props<{ error: any }>(),
+)
+
 // Delete waste request
 export const deleteWasteRequest = createAction(
   '[Waste Request] Delete Waste Request',
@@ -62,3 +77,5 @@ export const loadWasteRequestsFailure = createAction(
   '[Waste Request] Load Waste Requests Failure',
   props<{ error: any }>()
 );
+
+

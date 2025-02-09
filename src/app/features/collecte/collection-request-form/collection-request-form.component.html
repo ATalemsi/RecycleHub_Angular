@@ -47,60 +47,113 @@
           </div>
 
           <!-- Waste Types -->
-          <div formArrayName="wasteTypes" class="space-y-4">
-            <div *ngFor="let wasteType of wasteTypes.controls; let i = index" [formGroupName]="i" class="p-4 bg-white rounded-xl shadow-md">
-              <div class="flex justify-between items-center mb-2">
-                <h3 class="text-lg font-semibold text-gray-700">Type de déchet {{ i + 1 }}</h3>
-                <button type="button" (click)="removeWasteType(i)" *ngIf="wasteTypes.length > 1" class="text-red-500 hover:text-red-700">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
-                  </svg>
-                </button>
+          <!-- Waste Types -->
+          <div class="space-y-4">
+            <div class="bg-white rounded-xl shadow-md p-6">
+              <h3 class="text-lg font-semibold text-gray-700 mb-4">Types de déchets *</h3>
+              <div formArrayName="wasteTypes" class="space-y-4">
+                <div *ngFor="let typeControl of wasteTypesFormArray.controls; let i = index"
+                     [formGroupName]="i"
+                     class="flex items-center space-x-4">
+                  <div class="flex items-center space-x-3 flex-1">
+                    <input
+                      type="checkbox"
+                      [id]="'type-' + i"
+                      formControlName="selected"
+                      class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded cursor-pointer"
+                    >
+                    <label [for]="'type-' + i" class="text-sm font-medium text-gray-700 cursor-pointer">
+                      {{ wasteTypes[i].label }}
+                    </label>
+                  </div>
+
+                  <div class="flex-1" *ngIf="typeControl.get('selected')?.value">
+                    <div class="relative">
+                      <input
+                        type="number"
+                        [id]="'weight-' + i"
+                        formControlName="weight"
+                        class="w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm"
+                        placeholder="Poids en grammes"
+                        min="100"
+                        max="10000"
+                      >
+                      <span class="absolute right-3 top-2 text-gray-400 text-sm">g</span>
+                    </div>
+                    <div *ngIf="typeControl.get('weight')?.errors?.['required'] && typeControl.get('weight')?.touched"
+                         class="mt-1 text-sm text-red-600">
+                      Le poids est requis
+                    </div>
+                    <div *ngIf="typeControl.get('weight')?.errors?.['min'] && typeControl.get('weight')?.touched"
+                         class="mt-1 text-sm text-red-600">
+                      Minimum 100g
+                    </div>
+                    <div *ngIf="typeControl.get('weight')?.errors?.['max'] && typeControl.get('weight')?.touched"
+                         class="mt-1 text-sm text-red-600">
+                      Maximum 10kg (10000g)
+                    </div>
+                  </div>
+                </div>
               </div>
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div class="space-y-2">
-                  <label [for]="'wasteType' + i" class="block text-sm font-medium text-gray-700">Type *</label>
-                  <select
-                    [id]="'wasteType' + i"
-                    formControlName="type"
-                    class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm rounded-md"
-                  >
-                    <option value="">Sélectionnez le type</option>
-                    <option value="plastic">Plastique</option>
-                    <option value="glass">Verre</option>
-                    <option value="paper">Papier</option>
-                    <option value="metal">Métal</option>
-                  </select>
-                </div>
-                <div class="space-y-2">
-                  <label [for]="'estimatedWeight' + i" class="block text-sm font-medium text-gray-700">Poids estimé (g) *</label>
-                  <input
-                    type="number"
-                    [id]="'estimatedWeight' + i"
-                    formControlName="estimatedWeight"
-                    min="100"
-                    class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm"
-                    placeholder="100"
-                  >
-                </div>
+
+              <div *ngIf="wasteRequestForm.get('wasteTypes')?.errors?.['noTypeSelected'] && wasteRequestForm.get('wasteTypes')?.touched"
+                   class="mt-2 text-sm text-red-600">
+                Veuillez sélectionner au moins un type de déchet
+              </div>
+
+              <!-- Total Weight Display -->
+              <div class="mt-4 p-4 bg-green-50 rounded-lg">
+                <p class="text-sm font-medium text-green-800">
+                  Poids total: {{ getTotalWeight() }}g
+                </p>
               </div>
             </div>
           </div>
-
-          <button type="button" (click)="addWasteType()" class="mt-2 inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
-            Ajouter un type de déchet
-          </button>
-
           <!-- Collection Address -->
-          <div class="space-y-2">
-            <label for="collectionAddress" class="block text-sm font-medium text-gray-700">Adresse de collecte *</label>
-            <input
-              type="text"
-              id="collectionAddress"
-              formControlName="collectionAddress"
-              class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm"
-              placeholder="Entrez l'adresse de collecte"
-            >
+          <div class="space-y-4">
+            <div class="bg-white rounded-xl shadow-md p-6" formGroupName="collectionAddress">
+              <h3 class="text-lg font-semibold text-gray-700 mb-4">Adresse de collecte *</h3>
+
+              <!-- Street -->
+              <div class="space-y-2 mb-4">
+                <label for="street" class="block text-sm font-medium text-gray-700">Rue *</label>
+                <input
+                  type="text"
+                  id="street"
+                  formControlName="street"
+                  class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm"
+                  placeholder="Numéro et nom de rue"
+                >
+                <div *ngIf="wasteRequestForm.get('collectionAddress.street')?.errors?.['required'] && wasteRequestForm.get('collectionAddress.street')?.touched"
+                     class="text-sm text-red-600">
+                  La rue est requise
+                </div>
+                <div *ngIf="wasteRequestForm.get('collectionAddress.street')?.errors?.['minlength'] && wasteRequestForm.get('collectionAddress.street')?.touched"
+                     class="text-sm text-red-600">
+                  L'adresse doit contenir au moins 5 caractères
+                </div>
+              </div>
+
+              <!-- City -->
+              <div class="space-y-2">
+                <label for="city" class="block text-sm font-medium text-gray-700">Ville *</label>
+                <input
+                  type="text"
+                  id="city"
+                  formControlName="city"
+                  class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm"
+                  placeholder="Ville"
+                >
+                <div *ngIf="wasteRequestForm.get('collectionAddress.city')?.errors?.['required'] && wasteRequestForm.get('collectionAddress.city')?.touched"
+                     class="text-sm text-red-600">
+                  La ville est requise
+                </div>
+                <div *ngIf="wasteRequestForm.get('collectionAddress.city')?.errors?.['minlength'] && wasteRequestForm.get('collectionAddress.city')?.touched"
+                     class="text-sm text-red-600">
+                  La ville doit contenir au moins 2 caractères
+                </div>
+              </div>
+            </div>
           </div>
 
           <!-- Preferred Date and Time -->
