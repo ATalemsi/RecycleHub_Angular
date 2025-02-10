@@ -24,8 +24,6 @@ export class NavbarComponent {
 
   constructor(
     private readonly store: Store,
-    private readonly router: Router,
-    private readonly authService: AuthService,
   ) {}
 
   logout() {

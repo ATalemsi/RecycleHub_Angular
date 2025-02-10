@@ -90,7 +90,7 @@ export class CollectionRequestFormComponent implements OnInit {
         street: ['', [Validators.required, Validators.minLength(5)]],
         city: ['', [Validators.required, Validators.minLength(2)]]
       }),
-      preferredDateTime: ['', Validators.required],
+      preferredDateTime: ["", [Validators.required, this.dateTimeValidator()]],
       additionalNotes: [''],
       status: ['pending'],
       userId: [currentUser?.id || null],
@@ -133,6 +133,36 @@ export class CollectionRequestFormComponent implements OnInit {
       const group = control as FormGroup;
       return group.get('selected')?.value ? total + (group.get('weight')?.value || 0) : total;
     }, 0);
+  }
+
+  private dateTimeValidator(): ValidatorFn {
+    return (control: AbstractControl): ValidationErrors | null => {
+      if (!control.value) {
+        return { required: true }; // Return error if no value is provided
+      }
+
+      const selectedDate = new Date(control.value);
+      const today = new Date();
+
+      // Check if the selected date is in the past
+      if (selectedDate < today) {
+        return { pastDate: true }; // Return error if the date is in the past
+      }
+
+      // Check if time is between 09:00 and 18:00 (only if the date is today)
+      const selectedDateOnly = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate());
+      const todayOnly = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+
+      // If the selected date is today, validate the time
+      if (selectedDateOnly.getTime() === todayOnly.getTime()) {
+        const hours = selectedDate.getHours();
+        if (hours < 9 || hours >= 18) {
+          return { invalidTime: true }; // Return error if time is outside 09:00-18:00
+        }
+      }
+
+      return null; // Return null if the date and time are valid
+    };
   }
 
   atLeastOneSelected(): ValidatorFn {

@@ -15,4 +15,5 @@ export interface User {
   dateOfBirth: string;
   role: 'particulier' | 'collecteurs';
   profilePhoto?: string;
+  points?: number
 }

@@ -155,7 +155,6 @@
               </div>
             </div>
           </div>
-
           <!-- Preferred Date and Time -->
           <div class="space-y-2">
             <label for="preferredDateTime" class="block text-sm font-medium text-gray-700">Date et heure souhaitées *</label>
@@ -165,6 +164,22 @@
               formControlName="preferredDateTime"
               class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm"
             >
+            <div *ngIf="wasteRequestForm.get('preferredDateTime')?.errors?.['required'] && wasteRequestForm.get('preferredDateTime')?.touched"
+                 class="text-sm text-red-600">
+              La Date et le temps est requise
+            </div>
+            <div *ngIf="wasteRequestForm.get('preferredDateTime')?.errors?.['pastDate'] && wasteRequestForm.get('preferredDateTime')?.touched"
+                 class="text-sm text-red-600">
+              La date ne peut pas être dans le passé.
+            </div>
+            <div *ngIf="wasteRequestForm.get('preferredDateTime')?.errors?.['invalidDate'] && wasteRequestForm.get('preferredDateTime')?.touched"
+                 class="text-sm text-red-600">
+              La date doit être aujourd'hui.
+            </div>
+            <div *ngIf="wasteRequestForm.get('preferredDateTime')?.errors?.['invalidTime'] && wasteRequestForm.get('preferredDateTime')?.touched"
+                 class="text-sm text-red-600">
+              L'heure doit être entre 09:00 et 18:00.
+            </div>
           </div>
 
           <!-- Additional Notes -->

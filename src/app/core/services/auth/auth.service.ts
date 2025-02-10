@@ -17,7 +17,7 @@ export class AuthService {
       console.log("Starting registration process")
       const users = this.getUsers()
       console.log("Existing users:", users)
-      const newUser = { ...user, id: this.getNextId() }
+      const newUser = { ...user, id: this.getNextId(), points: 0 }
       users.push(newUser)
       console.log("Updated users array:", users)
       localStorage.setItem(this.usersKey, JSON.stringify(users))
@@ -36,6 +36,10 @@ export class AuthService {
     const users = this.getUsers()
     const user = users.find((u) => u.email === email && u.password === password)
     if (user) {
+      if (typeof user.points === "undefined") {
+        user.points = 0
+      }
+
       localStorage.setItem(this.loggedInUserKey, JSON.stringify(user))
       return of(user)
     }

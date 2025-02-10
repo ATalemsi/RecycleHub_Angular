@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { PointsComponent } from './points.component';
+import { VoucherDisplayComponent } from './voucher-display.component';
 
-describe('PointsComponent', () => {
-  let component: PointsComponent;
-  let fixture: ComponentFixture<PointsComponent>;
+describe('VoucherDisplayComponent', () => {
+  let component: VoucherDisplayComponent;
+  let fixture: ComponentFixture<VoucherDisplayComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [PointsComponent]
+      imports: [VoucherDisplayComponent]
     })
     .compileComponents();
     
-    fixture = TestBed.createComponent(PointsComponent);
+    fixture = TestBed.createComponent(VoucherDisplayComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

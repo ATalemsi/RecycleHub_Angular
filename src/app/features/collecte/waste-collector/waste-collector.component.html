@@ -19,7 +19,9 @@
       <div class="flex">
         <div class="flex-shrink-0">
           <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
-            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+            <path fill-rule="evenodd"
+                  d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                  clip-rule="evenodd"/>
           </svg>
         </div>
         <div class="ml-3">
@@ -31,7 +33,8 @@
     <!-- No Requests State -->
     <div *ngIf="(filteredRequests$ | async)?.length === 0" class="text-center py-12">
       <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
       </svg>
       <h3 class="mt-2 text-sm font-medium text-gray-900">No requests in your area</h3>
       <p class="mt-1 text-sm text-gray-500" *ngIf="currentUser$ | async as user">
@@ -54,6 +57,9 @@
                   Address
                 </th>
                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Points
+                </th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Status
                 </th>
                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -63,21 +69,44 @@
               </thead>
               <tbody class="bg-white divide-y divide-gray-200">
               <tr *ngFor="let request of filteredRequests$ | async">
+                <!-- Existing Waste Types column -->
                 <td class="px-6 py-4 whitespace-nowrap">
                   <div class="text-sm text-gray-900">
                     {{ getWasteTypesDisplay(request.wasteTypes) }}
                   </div>
                 </td>
+
+                <!-- Existing Address column -->
                 <td class="px-6 py-4 whitespace-nowrap">
                   <div class="text-sm text-gray-900">
                     {{ formatAddress(request.collectionAddress) }}
                   </div>
                 </td>
+
+                <!-- New Points column -->
                 <td class="px-6 py-4 whitespace-nowrap">
-                    <span [class]="getStatusBadgeClass(request.status)">
-                      {{ getStatusLabel(request.status) }}
-                    </span>
+                  <div class="text-sm" [ngClass]="{'text-gray-900': request.status !== 'validated', 'text-green-600 font-semibold': request.status === 'validated'}">
+                    {{ getPointsPreview(request.wasteTypes) }}
+                    <div *ngIf="request.status === 'validated'" class="text-xs text-green-500 mt-1">
+                      Points awarded!
+                    </div>
+                  </div>
+                  <!-- Show available voucher options if validated -->
+                  <div *ngIf="request.status === 'validated'" class="mt-2 text-xs text-gray-500">
+                    <div *ngFor="let voucher of getVoucherOptions(calculatePoints(request.wasteTypes))" class="mt-1">
+                      Eligible: {{ voucher.points }} pts = {{ voucher.value }} Dh
+                    </div>
+                  </div>
                 </td>
+
+                <!-- Existing Status column -->
+                <td class="px-6 py-4 whitespace-nowrap">
+      <span [class]="getStatusBadgeClass(request.status)">
+        {{ getStatusLabel(request.status) }}
+      </span>
+                </td>
+
+                <!-- Existing Actions column -->
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                   <select
                     *ngIf="canChangeStatus(request)"
@@ -93,8 +122,8 @@
                     </option>
                   </select>
                   <span *ngIf="!canChangeStatus(request)">
-                      {{ getStatusLabel(request.status) }}
-                    </span>
+        {{ getStatusLabel(request.status) }}
+      </span>
                 </td>
               </tr>
               </tbody>

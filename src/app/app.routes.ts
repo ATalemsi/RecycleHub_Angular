@@ -54,6 +54,12 @@ export const routes: Routes = [
       import("./features/collecte/waste-collector/waste-collector.component").then((m) => m.WasteCollectorComponent),
     canActivate: [AuthGuard, CollectorGuard],
   },
+  {
+    path: "rewards",
+   loadComponent: () =>
+      import("./features/points/voucher-display/voucher-display.component").then((m) => m.VoucherDisplayComponent),
+    canActivate: [AuthGuard , ParticulierGuard],
+  },
   { path: '', redirectTo: 'login', pathMatch: 'full' }, // Redirection par défaut vers login
   { path: '**', redirectTo: 'login' }, // Redirection pour les routes inconnues
 ];

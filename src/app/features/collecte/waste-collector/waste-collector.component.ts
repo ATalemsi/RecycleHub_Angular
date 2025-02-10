@@ -12,16 +12,29 @@ import {
   selectWasteRequestError,
   selectWasteRequestLoading,
 } from "../../../core/state/collection-requests/collection-requests.selectors"
-import { AsyncPipe, NgForOf, NgIf } from "@angular/common"
+import {AsyncPipe, NgClass, NgForOf, NgIf} from "@angular/common"
 import { NavbarComponent } from "../../navbar/navbar.component"
 import  { User } from "../../../shared/models/user.model"
+
+interface PointsConfig {
+  [key: string]: number
+  plastic: number
+  glass: number
+  paper: number
+  metal: number
+}
+
+interface VoucherConfig {
+  points: number
+  value: number
+}
 
 type WasteRequestStatus = WasteRequest["status"]
 
 @Component({
   selector: "app-waste-collector",
   standalone: true,
-  imports: [NgForOf, AsyncPipe, NgIf, NavbarComponent],
+  imports: [NgForOf, AsyncPipe, NgIf, NavbarComponent, NgClass],
   templateUrl: "./waste-collector.component.html",
   styleUrl: "./waste-collector.component.scss",
 })
@@ -32,6 +45,21 @@ export class WasteCollectorComponent implements OnInit {
   error$: Observable<any>
   currentUser$: Observable<User | null>
 
+  private readonly pointsConfig: PointsConfig = {
+    plastic: 2, // 2 points/kg
+    glass: 1, // 1 point/kg
+    paper: 1, // 1 point/kg
+    metal: 5, // 5 points/kg
+  }
+
+  private readonly voucherConfig: VoucherConfig[] = [
+    { points: 100, value: 50 },
+    { points: 200, value: 120 },
+    { points: 500, value: 350 },
+  ]
+
+  private readonly usersKey = "recyclehub-users"
+
   constructor(private readonly store: Store) {
     this.wasteRequests$ = this.store.select(selectAllWasteRequests)
     this.loading$ = this.store.select(selectWasteRequestLoading)
@@ -41,20 +69,60 @@ export class WasteCollectorComponent implements OnInit {
     // Filter requests based on collector's city
     this.filteredRequests$ = combineLatest([this.wasteRequests$, this.currentUser$]).pipe(
       map(([requests, user]) => {
-        if (!user) return []; // Return an empty array if user is undefined
+        if (!user) return []
         return requests.filter(
           (request) => request.collectionAddress.city.toUpperCase() === user.address.city.toUpperCase(),
-        );
+        )
       }),
-    );
+    )
   }
 
   ngOnInit() {
     this.store.dispatch(loadWasteRequests())
   }
 
+  private updateUserPoints(userId: string, pointsToAdd: number): void {
+    const usersString = localStorage.getItem(this.usersKey)
+
+    if (usersString) {
+      const users: User[] = JSON.parse(usersString)
+      const userIndex = users.findIndex((u) => u.id === userId)
+
+      if (userIndex !== -1) {
+        // Update points for the particulier user
+        users[userIndex] = {
+          ...users[userIndex],
+          points: (users[userIndex].points || 0) + Math.floor(pointsToAdd),
+        }
+
+        // Update users in localStorage
+        localStorage.setItem(this.usersKey, JSON.stringify(users))
+
+        // If this particulier user is currently logged in, update their session data too
+        const loggedInUserString = localStorage.getItem("loggedInUser")
+        if (loggedInUserString) {
+          const loggedInUser: User = JSON.parse(loggedInUserString)
+          if (loggedInUser.id === userId) {
+            loggedInUser.points = users[userIndex].points
+            localStorage.setItem("loggedInUser", JSON.stringify(loggedInUser))
+          }
+        }
+
+        // Show success message with user name
+        const userName = `${users[userIndex].firstName} ${users[userIndex].lastName}`
+        alert(`${Math.floor(pointsToAdd)} points have been awarded to ${userName}`)
+      }
+    }
+  }
+
   updateRequestStatus(request: WasteRequest, newStatus: WasteRequestStatus) {
     if (newStatus && newStatus !== request.status) {
+      // If status is changing to validated, calculate and award points
+      if (newStatus === "validated") {
+        const pointsEarned = this.calculatePoints(request.wasteTypes)
+        // Pass the particulier's userId from the request
+        this.updateUserPoints(request.userId, pointsEarned)
+      }
       this.store.dispatch(updateWasteRequestStatus({ request, newStatus }))
     }
   }
@@ -134,6 +202,33 @@ export class WasteCollectorComponent implements OnInit {
 
   getWasteTypesDisplay(wasteTypes: WasteTypeWeight[]): string {
     return wasteTypes.map((wt) => `${wt.type} (${wt.weight}g)`).join(", ")
+  }
+
+  calculatePoints(wasteTypes: WasteTypeWeight[]): number {
+    return wasteTypes.reduce((total, waste) => {
+      const pointsPerKg = this.pointsConfig[waste.type.toLowerCase()] || 0
+      // Convert grams to kg for points calculation
+      const weightInKg = waste.weight / 1000
+      return total + pointsPerKg * weightInKg
+    }, 0)
+  }
+
+  getPointsPreview(wasteTypes: WasteTypeWeight[]): string {
+    const points = this.calculatePoints(wasteTypes)
+    return `${Math.floor(points)} points`
+  }
+
+  getVoucherOptions(points: number): VoucherConfig[] {
+    return this.voucherConfig.filter((voucher) => points >= voucher.points)
+  }
+
+  getCurrentUserPoints(): number {
+    const userString = localStorage.getItem("loggedInUser")
+    if (userString) {
+      const user: User = JSON.parse(userString)
+      return user.points || 0
+    }
+    return 0
   }
 }
 
