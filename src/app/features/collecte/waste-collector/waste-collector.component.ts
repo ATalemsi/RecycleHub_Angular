@@ -222,13 +222,6 @@ export class WasteCollectorComponent implements OnInit {
     return this.voucherConfig.filter((voucher) => points >= voucher.points)
   }
 
-  getCurrentUserPoints(): number {
-    const userString = localStorage.getItem("loggedInUser")
-    if (userString) {
-      const user: User = JSON.parse(userString)
-      return user.points || 0
-    }
-    return 0
-  }
+
 }
 
