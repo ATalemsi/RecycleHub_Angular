@@ -5,7 +5,7 @@ import { catchError, map, switchMap, mergeMap, tap } from "rxjs/operators";
 import { AuthService } from "../../services/auth/auth.service";
 import * as AuthActions from "./auth.actions";
 import { CollecteurService } from "../../services/collecteur/collecteur.service";
-import {Router} from "@angular/router";
+import { Router } from "@angular/router";
 
 export enum UserRole {
   PARTICULIER = 'particulier',
@@ -14,7 +14,6 @@ export enum UserRole {
 
 @Injectable()
 export class AuthEffects {
-
   constructor(
     private readonly actions$: Actions,
     private readonly authService: AuthService,
@@ -25,15 +24,10 @@ export class AuthEffects {
   register$ = createEffect(() =>
     this.actions$.pipe(
       ofType(AuthActions.register),
-      tap(() => console.log('Register action received')), // Log de debug
       switchMap(({ user }) =>
         this.authService.register(user).pipe(
-          tap(newUser => console.log('Registration successful:', newUser)), // Log de debug
           map((newUser) => AuthActions.registerSuccess({ user: newUser })),
-          catchError((error) => {
-            console.error('Registration failed:', error); // Log de debug
-            return of(AuthActions.registerFailure({ error: error.message }));
-          }),
+          catchError((error) => of(AuthActions.registerFailure({ error: error.message }))),
         ),
       ),
     ),
@@ -44,7 +38,6 @@ export class AuthEffects {
       this.actions$.pipe(
         ofType(AuthActions.registerSuccess),
         tap(() => {
-          console.log('RegisterSuccess action received, navigating...'); // Log de debug
           this.router.navigate(["/login"]);
         }),
       ),
@@ -61,8 +54,7 @@ export class AuthEffects {
         ),
       ),
     ),
-  )
-
+  );
 
   loginSuccess$ = createEffect(
     () =>
@@ -70,16 +62,16 @@ export class AuthEffects {
         ofType(AuthActions.loginSuccess),
         tap(({ user }) => {
           if (user.role === UserRole.PARTICULIER) {
-            this.router.navigate(["/collections"])
+            this.router.navigate(["/collections"]);
           } else if (user.role === UserRole.COLLECTEURS) {
-            this.router.navigate(["/collections/dashboard"])
+            this.router.navigate(["/collections/dashboard"]);
           } else {
-            this.router.navigate(["/profile"])
+            this.router.navigate(["/profile"]);
           }
         }),
       ),
     { dispatch: false },
-  )
+  );
 
   updateProfile$ = createEffect(() =>
     this.actions$.pipe(
@@ -93,7 +85,6 @@ export class AuthEffects {
     ),
   );
 
-  // Update the auth.effects.ts
   deleteAccount$ = createEffect(() =>
     this.actions$.pipe(
       ofType(AuthActions.deleteAccount),
@@ -115,24 +106,32 @@ export class AuthEffects {
       ofType(AuthActions.loadCollecteurs),
       mergeMap(() =>
         this.collecteursService.loadCollecteursFromJson().pipe(
-          tap((collecteurs) => this.collecteursService.saveCollecteursToLocalStorage(collecteurs)),
+          tap((collecteurs) => {
+            try {
+              // Save collecteurs to sessionStorage instead of localStorage
+              sessionStorage.setItem('collecteurs', JSON.stringify(collecteurs));
+            } catch (error) {
+              console.error('Error saving collecteurs to sessionStorage:', error);
+            }
+          }),
           map((collecteurs) => AuthActions.loadCollecteursSuccess({ collecteurs })),
           catchError((error) => of(AuthActions.loadCollecteursFailure({ error: error.message }))),
         ),
       ),
     ),
   );
+
   logout$ = createEffect(
     () =>
       this.actions$.pipe(
         ofType(AuthActions.logout),
         tap(() => {
-          this.authService.logout()
-          this.router.navigate(["/login"])
+          this.authService.logout();
+          this.router.navigate(["/login"]);
         }),
       ),
     { dispatch: false },
-  )
+  );
 
   checkAuth$ = createEffect(() =>
     this.actions$.pipe(
@@ -154,13 +153,13 @@ export class AuthEffects {
     this.actions$.pipe(
       ofType(AuthActions.hydrateState),
       map(() => {
-        const user = this.authService.getLoggedInUser()
-        return AuthActions.hydrateStateSuccess({ user })
+        const user = this.authService.getLoggedInUser();
+        return AuthActions.hydrateStateSuccess({ user });
       }),
     ),
-  )
+  );
 
-  // Add this effect to persist state changes
+  // Modify the persistState$ effect to use sessionStorage
   persistState$ = createEffect(
     () =>
       this.actions$.pipe(
@@ -171,10 +170,46 @@ export class AuthEffects {
           AuthActions.logout,
         ),
         tap(() => {
-          const user = this.authService.getLoggedInUser()
-          localStorage.setItem("app-state", JSON.stringify({ auth: { user } }))
+          const user = this.authService.getLoggedInUser();
+
+          // Only store essential user information
+          const minimalUserData = user ? {
+            id: user.id,
+            email: user.email,
+            role: user.role,
+            points: user.points,
+            // Add other essential fields here
+          } : null;
+
+          try {
+            // Use sessionStorage instead of localStorage
+            sessionStorage.setItem(this.authService.loggedInUserKey, JSON.stringify(minimalUserData));
+          } catch (error) {
+            console.error('Error persisting state:', error);
+            // Optionally, dispatch an action to notify about the storage error
+            // this.store.dispatch(AuthActions.storageError({ error: error.message }));
+          }
         }),
       ),
     { dispatch: false },
-  )
+  );
+
+  // Add a new effect to clean up old data
+  cleanupStorage$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(AuthActions.loginSuccess),
+        tap(() => {
+          try {
+            // Remove any unnecessary items from sessionStorage
+            sessionStorage.removeItem('oldItem1');
+            sessionStorage.removeItem('oldItem2');
+            // Add more items to remove if needed
+          } catch (error) {
+            console.error('Error cleaning up storage:', error);
+          }
+        })
+      ),
+    { dispatch: false }
+  );
 }

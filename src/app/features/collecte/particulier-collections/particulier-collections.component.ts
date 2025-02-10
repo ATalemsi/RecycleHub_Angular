@@ -4,7 +4,7 @@
   import {Store} from "@ngrx/store";
   import {selectUser} from "../../../core/state/auth/auth.selectors";
   import {AsyncPipe, DatePipe, NgClass, NgForOf, NgIf, TitleCasePipe} from "@angular/common";
-  import {Router, RouterLink} from "@angular/router";
+  import {ActivatedRoute, Router, RouterLink} from "@angular/router";
   import {NavbarComponent} from "../../navbar/navbar.component";
   import {
     selectAllWasteRequests, selectWasteRequestLoading,
@@ -37,7 +37,7 @@
     userName$!: Observable<string>;
     loading$: Observable<boolean> = this.store.select(selectWasteRequestLoading);
 
-    constructor(private readonly store: Store ,  private readonly router: Router) {}
+    constructor(private readonly store: Store ,  private readonly router: Router ,  private readonly route: ActivatedRoute) {}
 
     ngOnInit(): void {
       this.store.dispatch(loadWasteRequests());
@@ -45,7 +45,9 @@
       this.userName$ = this.store.select(selectUser).pipe(
         map((user) => user ? user.firstName : '')
       );
-      this.wasteRequests$ = this.store.select(selectAllWasteRequests);
+      this.wasteRequests$ = this.route.data.pipe(
+        map((data) => data['wasteRequests'])
+      );
       this.store.select(selectAllWasteRequests).subscribe((requests) => {
         console.log('All Waste Requests:', requests);
       });
@@ -87,6 +89,10 @@
     }
     getWasteTypesDisplay(wasteTypes: WasteTypeWeight[]): string {
       return wasteTypes.map((wt) => `${wt.type} (${wt.weight}g)`).join(", ")
+    }
+
+    getImageUrl(photo: string | File): string {
+      return typeof photo === 'string' ? photo : URL.createObjectURL(photo);
     }
 
   }

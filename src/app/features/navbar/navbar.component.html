@@ -9,7 +9,7 @@
     <div class="flex items-center space-x-4">
       <ng-container *ngIf="user$ | async as user">
         <ng-container *ngIf="user.role === 'collecteurs'">
-          <a [routerLink]="['/waste-collection']" class="text-white hover:text-green-200 transition-colors duration-200">Waste Collection</a>
+          <a [routerLink]="['/collections/dashboard']" class="text-white hover:text-green-200 transition-colors duration-200">Waste Collection</a>
         </ng-container>
         <ng-container *ngIf="user.role === 'particulier'">
           <a [routerLink]="['/collections']" class="text-white hover:text-green-200 transition-colors duration-200">Collection Particulier</a>

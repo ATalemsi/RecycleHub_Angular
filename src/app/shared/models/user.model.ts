@@ -14,6 +14,6 @@ export interface User {
   phoneNumber: string;
   dateOfBirth: string;
   role: 'particulier' | 'collecteurs';
-  profilePhoto?: string;
+  profilePhoto?: string | File;
   points?: number
 }

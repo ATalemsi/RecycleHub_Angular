@@ -17,9 +17,10 @@ import {
 
 export function localStorageSyncReducer(reducer: any): any {
   return localStorageSync({
-    keys: ["auth"],
+    keys: ['auth'],
     rehydrate: true,
-  })(reducer)
+    storage: sessionStorage, // Use sessionStorage instead of localStorage
+  })(reducer);
 }
 
 const metaReducers: MetaReducer[] = [localStorageSyncReducer]

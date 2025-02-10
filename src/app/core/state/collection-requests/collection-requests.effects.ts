@@ -28,22 +28,26 @@ export class WasteRequestEffects {
   addWasteRequest$ = createEffect(() =>
     this.actions$.pipe(
       ofType(WasteRequestActions.addWasteRequest),
-      mergeMap(action => {
-        this.wasteRequestService.addWasteRequest(action.request);
-        return of(WasteRequestActions.addWasteRequestSuccess({ request: action.request }));
-      })
-    )
-  );
+      mergeMap((action) =>
+        this.wasteRequestService.addWasteRequest(action.request).pipe(
+          map((request) => WasteRequestActions.addWasteRequestSuccess({ request })),
+          catchError((error) => of(WasteRequestActions.addWasteRequestFailure({ error }))),
+        ),
+      ),
+    ),
+  )
 
   updateWasteRequest$ = createEffect(() =>
     this.actions$.pipe(
       ofType(WasteRequestActions.updateWasteRequest),
-      mergeMap(action => {
-        this.wasteRequestService.updateWasteRequest(action.request);
-        return of(WasteRequestActions.loadWasteRequests());
-      })
-    )
-  );
+      mergeMap((action) =>
+        this.wasteRequestService.updateWasteRequest(action.request).pipe(
+          map((request) => WasteRequestActions.updateWasteRequestSuccess({ request })),
+          catchError((error) => of(WasteRequestActions.updateWasteRequestFailure({ error }))),
+        ),
+      ),
+    ),
+  )
 
   updateWasteRequestStatus$ = createEffect(() =>
     this.actions$.pipe(

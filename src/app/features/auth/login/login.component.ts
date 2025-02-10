@@ -3,7 +3,7 @@ import {Store} from "@ngrx/store";
 import {login} from "../../../core/state/auth/auth.actions";
 import {FormsModule} from "@angular/forms";
 import {selectError, selectLoading} from "../../../core/state/auth/auth.selectors";
-import {Router} from "@angular/router";
+import {Router, RouterLink} from "@angular/router";
 import {AsyncPipe, NgIf} from "@angular/common";
 
 @Component({
@@ -12,7 +12,8 @@ import {AsyncPipe, NgIf} from "@angular/common";
   imports: [
     FormsModule,
     AsyncPipe,
-    NgIf
+    NgIf,
+    RouterLink
   ],
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss'

@@ -86,7 +86,7 @@
                     </div>
                     <div *ngIf="typeControl.get('weight')?.errors?.['min'] && typeControl.get('weight')?.touched"
                          class="mt-1 text-sm text-red-600">
-                      Minimum 100g
+                      Minimum 1000g
                     </div>
                     <div *ngIf="typeControl.get('weight')?.errors?.['max'] && typeControl.get('weight')?.touched"
                          class="mt-1 text-sm text-red-600">
@@ -179,6 +179,36 @@
             <div *ngIf="wasteRequestForm.get('preferredDateTime')?.errors?.['invalidTime'] && wasteRequestForm.get('preferredDateTime')?.touched"
                  class="text-sm text-red-600">
               L'heure doit être entre 09:00 et 18:00.
+            </div>
+          </div>
+
+          <div class="space-y-4">
+            <div class="bg-white rounded-xl shadow-md p-6">
+              <h3 class="text-lg font-semibold text-gray-700 mb-4">Photos des déchets (optionnel)</h3>
+              <div class="space-y-4">
+                <div class="flex items-center justify-center w-full">
+                  <label for="wastePhotos" class="flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100">
+                    <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                      <svg class="w-10 h-10 mb-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                      </svg>
+                      <p class="mb-2 text-sm text-gray-500"><span class="font-semibold">Cliquez pour télécharger</span> ou glissez et déposez</p>
+                      <p class="text-xs text-gray-500">PNG, JPG ou GIF (MAX. 5MB par fichier, 5 fichiers max)</p>
+                    </div>
+                    <input id="wastePhotos" type="file" class="hidden" multiple (change)="onFileSelected($event)" accept="image/*" />
+                  </label>
+                </div>
+                <div class="grid grid-cols-2 gap-4 mt-4">
+                  <div *ngFor="let photoUrl of imagePreviewUrls; let i = index" class="relative">
+                    <img [src]="photoUrl" alt="Waste photo" class="w-full h-32 object-cover rounded-lg">
+                    <button type="button" (click)="removeImage(i)" class="absolute top-0 right-0 bg-red-500 text-white rounded-full p-1 m-1">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 

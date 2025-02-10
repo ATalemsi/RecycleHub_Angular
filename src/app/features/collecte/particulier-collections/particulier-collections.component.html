@@ -20,9 +20,9 @@
     </div>
     <div class="mt-12">
       <h2 class="text-2xl font-semibold mb-6 text-green-700 text-center">Existing Requests</h2>
-      <div *ngIf="(filteredWasteRequests$ | async) as requests" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <div *ngFor="let request of requests" class="bg-white shadow-lg rounded-lg overflow-hidden transition duration-300 ease-in-out transform hover:scale-102 hover:shadow-xl">
-          <div class="p-6">
+      <div *ngIf="(filteredWasteRequests$ | async) as requests" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div *ngFor="let request of requests" class="bg-white shadow-lg rounded-lg overflow-hidden transition duration-300 ease-in-out transform hover:scale-102 hover:shadow-xl flex flex-col">
+          <div class="p-6 flex-grow">
             <div class="flex justify-between items-center mb-4">
               <h3 class="text-xl font-semibold text-green-600">{{ getWasteTypesDisplay(request.wasteTypes) }}</h3>
               <span [ngClass]="{
@@ -44,8 +44,17 @@
             <div *ngIf="request.additionalNotes" class="mt-4 p-3 bg-green-50 rounded-md">
               <p class="text-sm text-green-700"><span class="font-medium">Notes:</span> {{ request.additionalNotes }}</p>
             </div>
+            <!-- Waste Photos Section -->
+            <div *ngIf="request.wastePhotos && request.wastePhotos.length > 0" class="mt-4">
+              <h4 class="text-lg font-semibold text-green-600 mb-2">Waste Photos</h4>
+              <div class="grid grid-cols-2 gap-2">
+                <div *ngFor="let photo of request.wastePhotos" class="relative aspect-square">
+                  <img [src]="getImageUrl(photo)" alt="Waste photo" class="object-cover w-full h-full rounded-md">
+                </div>
+              </div>
+            </div>
           </div>
-          <div *ngIf="request.status == 'pending'" class="bg-green-50 px-6 py-4 flex justify-between">
+          <div *ngIf="request.status === 'pending'" class="bg-green-50 px-6 py-4 flex justify-between mt-auto">
             <button (click)="editRequest(request.id!)" class="text-green-600 hover:text-green-800 font-medium transition duration-300 ease-in-out">Edit</button>
             <button (click)="deleteRequest(request.id!)" class="text-red-600 hover:text-red-800 font-medium transition duration-300 ease-in-out">Cancel</button>
           </div>
@@ -54,4 +63,3 @@
     </div>
   </div>
 </div>
-

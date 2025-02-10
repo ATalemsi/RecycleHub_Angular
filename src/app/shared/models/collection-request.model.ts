@@ -9,7 +9,7 @@ export interface WasteTypeWeight {
 export interface WasteRequest {
   id?: string;
   wasteTypes: WasteTypeWeight[];  // Changed from wasteType: string[]
-  wastePhotos?: string[];
+  wastePhotos?: (File | string)[]
   estimatedWeight: number;  // This will be the sum of all waste type weights
   collectionAddress: Address;
   preferredDateTime: Date;

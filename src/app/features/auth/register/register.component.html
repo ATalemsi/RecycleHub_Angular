@@ -111,6 +111,20 @@
               </p>
             </div>
           </div>
+          <div class="md:col-span-2 space-y-2">
+            <label for="profilePhoto" class="block text-base font-semibold text-green-800">Photo de profil (optionnel)</label>
+            <input
+              type="file"
+              id="profilePhoto"
+              name="profilePhoto"
+              (change)="onFileSelected($event)"
+              accept="image/*"
+              class="w-full p-4 bg-white/80 border-2 border-green-200 rounded-xl focus:ring-4 focus:ring-green-500/20 focus:border-green-500 transition-all"
+            >
+            <p *ngIf="formErrors.profilePhoto" class="mt-2 text-sm text-red-600">
+              {{ formErrors.profilePhoto }}
+            </p>
+          </div>
         </div>
 
         <!-- Coordonnées -->
@@ -230,7 +244,7 @@
 
           <p class="text-center text-lg text-green-700">
             Déjà membre ?
-            <a href="/login" class="text-green-600 hover:text-green-700 font-medium underline">
+            <a routerLink="/login" class="text-green-600 hover:text-green-700 font-medium underline">
               Se connecter
             </a>
           </p>

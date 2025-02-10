@@ -1,34 +1,51 @@
 import { Injectable } from "@angular/core"
-import { Observable, of, throwError } from "rxjs"
+import {from, Observable, of, throwError} from "rxjs"
 import type { User } from "../../../shared/models/user.model"
+import {catchError, map} from "rxjs/operators";
 
 @Injectable({
   providedIn: "root",
 })
 export class AuthService {
   private readonly usersKey = "recyclehub-users"
-  private readonly loggedInUserKey = "loggedInUser"
+  readonly loggedInUserKey = "loggedInUser"
 
   constructor() {}
 
   // Register a new user
   register(user: User): Observable<User> {
-    try {
-      console.log("Starting registration process")
-      const users = this.getUsers()
-      console.log("Existing users:", users)
-      const newUser = { ...user, id: this.getNextId(), points: 0 }
-      users.push(newUser)
-      console.log("Updated users array:", users)
-      localStorage.setItem(this.usersKey, JSON.stringify(users))
-      console.log("Users saved to localStorage")
-      localStorage.setItem(this.loggedInUserKey, JSON.stringify(newUser))
-      console.log("New user set as logged in")
-      return of(newUser)
-    } catch (error) {
-      console.error("Error during registration:", error)
-      return throwError(() => error)
+    return from(this.processRegistration(user)).pipe(
+      map((newUser) => {
+        const users = this.getUsers()
+        users.push(newUser)
+        localStorage.setItem(this.usersKey, JSON.stringify(users))
+        localStorage.setItem(this.loggedInUserKey, JSON.stringify(newUser))
+        return newUser
+      }),
+      catchError((error) => {
+        console.error("Error during registration:", error)
+        return throwError(() => error)
+      }),
+    )
+  }
+
+  private async processRegistration(user: User): Promise<User> {
+    const newUser = { ...user, id: this.getNextId(), points: 0 }
+
+    if (newUser.profilePhoto && newUser.profilePhoto instanceof File) {
+      newUser.profilePhoto = await this.convertToBase64(newUser.profilePhoto)
     }
+
+    return newUser
+  }
+
+  private convertToBase64(file: File): Promise<string> {
+    return new Promise<string>((resolve, reject) => {
+      const reader = new FileReader()
+      reader.onload = () => resolve(reader.result as string)
+      reader.onerror = (error) => reject(error)
+      reader.readAsDataURL(file)
+    })
   }
 
   // Login user

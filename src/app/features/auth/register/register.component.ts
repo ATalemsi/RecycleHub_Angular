@@ -5,6 +5,7 @@ import { register } from "../../../core/state/auth/auth.actions";
 import { FormsModule } from "@angular/forms";
 import { selectError, selectLoading } from "../../../core/state/auth/auth.selectors";
 import { NgIf, AsyncPipe } from "@angular/common";
+import {RouterLink} from "@angular/router";
 
 @Component({
   selector: 'app-register',
@@ -12,7 +13,8 @@ import { NgIf, AsyncPipe } from "@angular/common";
   imports: [
     FormsModule,
     NgIf,
-    AsyncPipe
+    AsyncPipe,
+    RouterLink
   ],
   templateUrl: './register.component.html',
   styleUrl: './register.component.scss'
@@ -31,6 +33,7 @@ export class RegisterComponent {
     phoneNumber: '',
     dateOfBirth: '',
     role: 'particulier',
+    profilePhoto: undefined,
   };
 
   formErrors = {
@@ -43,6 +46,7 @@ export class RegisterComponent {
     'address.city': '',
     phoneNumber: '',
     terms: '',
+    profilePhoto: "",
     general: ''
   };
 
@@ -139,6 +143,14 @@ export class RegisterComponent {
           this.formErrors.phoneNumber = '';
         }
         break;
+
+      case 'profilePhoto':
+        if (this.user.profilePhoto && !this.isValidImageFile(this.user.profilePhoto as File)) {
+          this.formErrors.profilePhoto = "Le fichier sélectionné n'est pas une image valide"
+        } else {
+          this.formErrors.profilePhoto = ""
+        }
+        break;
     }
   }
 
@@ -169,6 +181,15 @@ export class RegisterComponent {
     }
   }
 
+  onFileSelected(event: Event): void {
+    const file = (event.target as HTMLInputElement).files?.[0]
+    if (file) {
+      this.user.profilePhoto = file
+      this.validateField("profilePhoto")
+    }
+  }
+
+
   private resetErrors() {
     this.formErrors = {
       firstName: '',
@@ -180,6 +201,7 @@ export class RegisterComponent {
       'address.city': '',
       phoneNumber: '',
       terms: '',
+      profilePhoto: "",
       general: ''
     };
   }
@@ -214,5 +236,10 @@ export class RegisterComponent {
   private emailExists(email: string): boolean {
     const users = JSON.parse(localStorage.getItem('recyclehub-users') || '[]');
     return users.some((user: User) => user.email === email);
+  }
+
+  private isValidImageFile(file: File): boolean {
+    const acceptedImageTypes = ["image/jpeg", "image/png", "image/gif"]
+    return file && acceptedImageTypes.includes(file.type)
   }
 }

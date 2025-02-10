@@ -27,11 +27,10 @@ export class ProfileUserComponent implements OnInit, OnDestroy {
   showPassword = false
   private userSubscription!: Subscription
   private readonly destroy$ = new Subject<void>()
+  profilePhotoUrl: string | null = null
 
   constructor(
     private readonly store: Store<{ auth: AuthState }>,
-    private readonly router: Router,
-    private readonly authService: AuthService,
     private readonly fb: FormBuilder,
   ) {
     this.profileForm = this.fb.group(
@@ -70,6 +69,15 @@ export class ProfileUserComponent implements OnInit, OnDestroy {
           dateOfBirth: user.dateOfBirth,
           role: user.role,
         })
+        if (user.profilePhoto) {
+          if (typeof user.profilePhoto === "string") {
+            this.profilePhotoUrl = user.profilePhoto
+          } else if (user.profilePhoto instanceof File) {
+            this.convertToBase64(user.profilePhoto)
+          }
+        } else {
+          this.profilePhotoUrl = null
+        }
       }
     })
   }
@@ -124,6 +132,22 @@ export class ProfileUserComponent implements OnInit, OnDestroy {
     } else {
       confirmPassword?.setErrors(null)
     }
+  }
+
+  onFileSelected(event: Event): void {
+    const file = (event.target as HTMLInputElement).files?.[0]
+    if (file) {
+      this.convertToBase64(file)
+      this.profileForm.patchValue({ profilePhoto: file })
+    }
+  }
+
+  private convertToBase64(file: File): void {
+    const reader = new FileReader()
+    reader.onload = (e: any) => {
+      this.profilePhotoUrl = e.target.result
+    }
+    reader.readAsDataURL(file)
   }
 }
 
