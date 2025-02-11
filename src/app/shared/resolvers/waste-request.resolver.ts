@@ -1,21 +1,21 @@
-import { Injectable } from '@angular/core';
-import { Resolve } from '@angular/router';
-import { Store } from '@ngrx/store';
-import { Observable } from 'rxjs';
+import {Injectable} from "@angular/core";
 import {WasteRequest} from "../models/collection-request.model";
+import {Resolve} from "@angular/router";
+import {Store} from "@ngrx/store";
+import {Observable} from "rxjs";
 import {loadWasteRequests} from "../../core/state/collection-requests/collection-requests.actions";
 import {selectAllWasteRequests} from "../../core/state/collection-requests/collection-requests.selectors";
 
 
-@Injectable({ providedIn: 'root' })
-export class WasteRequestsResolver implements Resolve<WasteRequest[]> {
-  constructor(private readonly store: Store) {}
+@Injectable({providedIn: "root"})
+export class WasteRequestResolver implements Resolve<WasteRequest[]>{
 
-  resolve(): Observable<WasteRequest[]> {
-    // Dispatch the action to load waste requests
+  constructor(private readonly  store : Store) {
+  }
+
+  resolve() : Observable<WasteRequest[]> {
     this.store.dispatch(loadWasteRequests());
 
-    // Return the observable of all waste requests
-    return this.store.select(selectAllWasteRequests);
+    return  this.store.select(selectAllWasteRequests);
   }
 }

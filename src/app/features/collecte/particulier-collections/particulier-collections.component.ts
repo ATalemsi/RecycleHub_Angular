@@ -37,16 +37,17 @@
     userName$!: Observable<string>;
     loading$: Observable<boolean> = this.store.select(selectWasteRequestLoading);
 
-    constructor(private readonly store: Store ,  private readonly router: Router ,  private readonly route: ActivatedRoute) {}
+    constructor(private readonly store: Store ,  private readonly router: Router , private readonly route: ActivatedRoute) {}
 
     ngOnInit(): void {
-      this.store.dispatch(loadWasteRequests());
-      this.currentUser$ = this.store.select(selectUser);
-      this.userName$ = this.store.select(selectUser).pipe(
-        map((user) => user ? user.firstName : '')
-      );
       this.wasteRequests$ = this.route.data.pipe(
         map((data) => data['wasteRequests'])
+      );
+
+      // Fetch current user
+      this.currentUser$ = this.store.select(selectUser);
+      this.userName$ = this.store.select(selectUser).pipe(
+        map((user) => (user ? user.firstName : ''))
       );
       this.store.select(selectAllWasteRequests).subscribe((requests) => {
         console.log('All Waste Requests:', requests);

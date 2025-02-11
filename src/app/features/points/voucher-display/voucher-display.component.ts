@@ -61,7 +61,7 @@ export class VoucherDisplayComponent {
       const currentPoints = currentUser.points || 0
 
       if (currentPoints >= tier.points) {
-        // Deduct points from current user
+
         currentUser.points = currentPoints - tier.points
 
         // Update loggedInUser

@@ -48,6 +48,7 @@ export class ProfileUserComponent implements OnInit, OnDestroy {
         password: ["", [Validators.minLength(6)]],
         confirmPassword: [""],
         role: [""],
+        points: [""],
       },
       { validator: this.passwordMatchValidator },
     )
@@ -68,6 +69,7 @@ export class ProfileUserComponent implements OnInit, OnDestroy {
           },
           dateOfBirth: user.dateOfBirth,
           role: user.role,
+          points: user.points,
         })
         if (user.profilePhoto) {
           if (typeof user.profilePhoto === "string") {

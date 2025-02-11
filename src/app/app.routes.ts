@@ -2,7 +2,7 @@ import { Routes } from '@angular/router';
 import {AuthGuard} from "./Guards/auth.guard";
 import {ParticulierGuard} from "./Guards/particulier.guard";
 import {CollectorGuard} from "./Guards/collector.guard";
-import {WasteRequestsResolver} from "./shared/resolvers/waste-request.resolver";
+import {WasteRequestResolver} from "./shared/resolvers/waste-request.resolver";
 
 export const routes: Routes = [
   {
@@ -33,7 +33,7 @@ export const routes: Routes = [
       ),
     canActivate: [AuthGuard, ParticulierGuard],
     resolve: {
-      wasteRequests: WasteRequestsResolver,
+      wasteRequests: WasteRequestResolver,
     },
   },
   {
